@@ -1,4 +1,5 @@
 import { AuthorizationDetails } from '@auth0/auth0-auth-js';
+import { JWTDecryptOptions, JWTPayload } from 'jose';
 
 export interface ServerClientOptions<TStoreOptions = unknown> {
   domain: string;
@@ -18,7 +19,7 @@ export interface ServerClientOptions<TStoreOptions = unknown> {
 
   /**
    * Indicates whether the SDK should use the mTLS endpoints if they are available.
-   * 
+   *
    * When set to `true`, using a `customFetch` is required.
    */
   useMtls?: boolean;
@@ -105,6 +106,8 @@ export interface TransactionStore<TStoreOptions = unknown> extends AbstractDataS
 
 export interface EncryptedStoreOptions {
   secret: string;
+  customEncrypt?: EncryptHandler;
+  customDecrypt?: DecryptHandler;
 }
 
 export interface StartInteractiveLoginOptions<TAppState = unknown> {
@@ -156,7 +159,7 @@ export interface SessionConfiguration {
    *
    * Default: `true`.
    */
-  rolling?: boolean
+  rolling?: boolean;
   /**
    * The absolute duration after which the session will expire. The value must be specified in seconds..
    *
@@ -164,7 +167,7 @@ export interface SessionConfiguration {
    *
    * Default: 3 days.
    */
-  absoluteDuration?: number
+  absoluteDuration?: number;
   /**
    * The duration of inactivity after which the session will expire. The value must be specified in seconds.
    *
@@ -172,12 +175,12 @@ export interface SessionConfiguration {
    *
    * Default: 1 day.
    */
-  inactivityDuration?: number
+  inactivityDuration?: number;
 
   /**
    * The options for the session cookie.
    */
-  cookie?: SessionCookieOptions
+  cookie?: SessionCookieOptions;
 }
 
 export interface SessionStore<TStoreOptions> {
@@ -193,17 +196,40 @@ export interface SessionCookieOptions {
    *
    * Default: `__a0_session`.
    */
-  name?: string
+  name?: string;
   /**
    * The sameSite attribute of the session cookie.
    *
    * Default: `lax`.
    */
-  sameSite?: "strict" | "lax" | "none"
+  sameSite?: 'strict' | 'lax' | 'none';
   /**
    * The secure attribute of the session cookie.
    *
    * Default: depends on the protocol of the application's base URL. If the protocol is `https`, then `true`, otherwise `false`.
    */
-  secure?: boolean
+  secure?: boolean;
 }
+
+export interface EncryptOptions {
+  additionalHeaders?: {
+    iat: number;
+    uat: number;
+    exp: number;
+  };
+  expiration: number;
+  payload: JWTPayload;
+  salt: string;
+  secret: string;
+}
+
+export type EncryptHandler = (options: EncryptOptions) => Promise<string>;
+
+export interface DecryptOptions {
+  options?: JWTDecryptOptions;
+  salt: string;
+  secret: string;
+  value: string;
+}
+
+export type DecryptHandler = (options: DecryptOptions) => Promise<JWTPayload>;
