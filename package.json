@@ -10,7 +10,8 @@
     "clean": "turbo run clean",
     "test": "turbo run test",
     "lint": "turbo run lint",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "prepare": "npm run build"
   },
   "author": "",
   "license": "ISC",

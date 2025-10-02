@@ -11,8 +11,7 @@
     "clean": "rm -rf ./dist",
     "lint": "eslint \"./**/*.ts*\"",
     "test": "vitest run",
-    "test:ci": "vitest --watch false --coverage",
-    "prepare": "npm run build"
+    "test:ci": "vitest --watch false --coverage"
   },
   "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
