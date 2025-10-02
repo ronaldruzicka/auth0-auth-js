@@ -1,5 +1,6 @@
+import type { DecryptOptions, EncryptOptions } from '../types';
+
 import { EncryptJWT, jwtDecrypt } from 'jose';
-import type { JWTPayload } from 'jose';
 
 const ENC = 'A256CBC-HS512';
 const ALG = 'dir';
@@ -27,7 +28,7 @@ async function deriveEncryptionSecret(secret: string, salt: string, kid: string)
   );
 }
 
-export async function encrypt(payload: JWTPayload, secret: string, salt: string, expiration: number) {
+export async function encrypt({ expiration, salt, secret, payload }: EncryptOptions) {
   const kid = crypto.randomUUID();
   const encryptionSecret = await deriveEncryptionSecret(secret, salt, kid);
 
@@ -37,11 +38,10 @@ export async function encrypt(payload: JWTPayload, secret: string, salt: string,
     .encrypt(encryptionSecret);
 }
 
-export async function decrypt<T>(value: string, secret: string, salt: string) {
+export async function decrypt<T>({ salt, secret, value }: DecryptOptions) {
   const res = await jwtDecrypt<T>(
     value,
     async (protectedHeader) => {
-
       // This error shouldn't happen, as we always set a kid.
       // However, leaving this here as a safety net.
       if (!protectedHeader.kid) {
